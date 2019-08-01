@@ -1,9 +1,6 @@
-# jupyterlab-drawio
+# jupyterlab-zethus
 
-[![Binder with JupyterLab](https://mybinder.org/badge_logo.svg)](http://mybinder.org/v2/gh/QuantStack/jupyterlab-drawio/master?urlpath=lab)
-
-
-A JupyterLab extension for standalone integration of drawio / mxgraph into jupyterlab.
+A JupyterLab extension for standalone integration of *ZETHUS* into JupyterLab.
 
 ## Prerequisites
 
@@ -11,13 +8,13 @@ A JupyterLab extension for standalone integration of drawio / mxgraph into jupyt
 
 ## Installation
 
+*NOT PUBLISHED YET -- THIS DOES NOT WORK!*
+
 ```bash
-jupyter labextension install jupyterlab-drawio
+jupyter labextension install jupyterlab-zethus
 ```
 
 ## Usage
-
-![drawio-screencast](drawio.gif)
 
 ## Development
 
@@ -38,6 +35,6 @@ jupyter lab build
 
 ## License
 
-The files herein, and especially the source code of mxgraph, is licensed under the Apache 2.0 License.
-The copyright holders of draw.io / mxgraph is jgraph (http://www.jgraph.com). The original source code
-vendored in this package is taken from: https://github.com/jgraph/mxgraph 
+The files herein, and especially the source code of zethus, is licensed under the Apache 2.0 License.
+The copyright holders of zethus is Rapyuta Robotics (http://www.rapyuta-robotics.com). The original source code
+vendored in this package is taken from: https://github.com/rapyuta-robotics/zethus
