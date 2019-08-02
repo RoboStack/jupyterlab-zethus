@@ -1,5 +1,6 @@
-import React from 'react';
 import ReactDOM from 'react-dom';
-import Wrapper from './components';
+import React from 'react';
 
-ReactDOM.render(<Wrapper />, document.getElementById('root'));
+import Zethus from './zethus';
+
+ReactDOM.render(<Zethus />, document.getElementById('root'));

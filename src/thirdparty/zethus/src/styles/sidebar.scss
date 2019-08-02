@@ -56,8 +56,10 @@
 }
 
 #logo {
-  height: 40px;
-  display: block;
+  svg {
+    height: 40px;
+    display: block;
+  }
 }
 
 #sidebar {
@@ -71,6 +73,10 @@
 #rosStatus {
   margin-bottom: 10px;
   align-items: center;
+}
+
+#sidebarVizContainer {
+  overflow-y: auto;
 }
 
 #rosStatusIndicator {

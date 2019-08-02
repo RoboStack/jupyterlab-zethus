@@ -14,7 +14,8 @@
 
 import ReactDOM from 'react-dom';
 import React from 'react';
-import Wrapper from './thirdparty/zethus/src/components';
+
+import Zethus from './thirdparty/zethus/src/zethus';
 
 import "../style/common.css";
 import "../style/sidebar.css";
@@ -63,9 +64,10 @@ class ZethusWidget extends DocumentWidget<Widget> {
 
     protected onAfterShow(msg: Message): void {
         // this._loadEditor(this.node);
-        // this._onContentChanged();
-        ReactDOM.render(React.createElement(Wrapper),
-                        this.node);
+        const editor_value = this.context.model.toString();
+        let state = JSON.parse(editor_value);
+        console.log(state);
+        ReactDOM.render(React.createElement(Zethus, state), this.node);
     }
 
     public getSVG() : string {
@@ -77,7 +79,7 @@ class ZethusWidget extends DocumentWidget<Widget> {
         // const contextModel = this.context.model;
 
         // // Set the editor model value.
-        // this._onContentChanged();
+        this._onContentChanged();
 
         // contextModel.contentChanged.connect(this._onContentChanged, this);
         // contextModel.stateChanged.connect(this._onModelStateChangedNew, this);
@@ -119,8 +121,9 @@ class ZethusWidget extends DocumentWidget<Widget> {
         // }
 
         // const oldValue = mx.mxUtils.getXml(this._editor.editor.getGraphXml());
-        // const newValue = this.context.model.toString();
-
+        const editor_value = this.context.model.toString();
+        let state = JSON.parse(editor_value);
+        console.log(state);
         // if (oldValue !== newValue && !this._editor.editor.graph.isEditing()) {
         //     if (newValue.length)
         //     {
