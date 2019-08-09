@@ -48,6 +48,91 @@ import {
 
 const DIRTY_CLASS = 'jp-mod-dirty';
 
+const default_config = `{
+  "panels": {
+    "sidebar": {
+      "display": true
+    },
+    "tools": {
+      "display": false
+    },
+    "info": {
+      "display": false
+    }
+  },
+  "ros": {
+    "endpoint": "ws://localhost:9090"
+  },
+  "visualizations": [
+    {
+      "vizType": "RobotModel",
+      "topicName": "robot_description",
+      "messageType": "",
+      "name": "Robot",
+      "key": "10",
+      "visible": true,
+      "packages": {
+        "ur_description": "http://localhost:8888/ros_static/ur_description",
+        "robotiq_2f_85_gripper_visualization": "http://localhost:8888/ros_static/robotiq_2f_85_gripper_visualization"
+      }
+    },
+    {
+      "vizType": "PoseArray",
+      "topicName": "/pose_array_rosbag",
+      "messageType": "geometry_msgs/PoseArray",
+      "name": "Posearray",
+      "key": "9",
+      "visible": true
+    }
+  ],
+  "globalOptions": {
+    "display": true,
+    "backgroundColor": {
+      "display": true,
+      "value": [
+        28,
+        28,
+        28
+      ]
+    },
+    "fixedFrame": {
+      "display": true,
+      "value": "world"
+    },
+    "grid": {
+      "display": true,
+      "size": 3,
+      "count": 10,
+      "color": [
+        48,
+        48,
+        48
+      ]
+    }
+  },
+  "tools": {
+    "mode": "controls",
+    "controls": {
+      "display": false,
+      "enabled": true
+    },
+    "measure": {
+      "display": false
+    },
+    "custom": [
+      {
+        "name": "Nav goal",
+        "type": "publishPose",
+        "topic": "/navgoal"
+      },
+      {
+        "name": "Nav goal",
+        "type": "publishPoseWithCovariance",
+        "topic": "initialpose"
+      }
+    ]
+  }
+}`
 
 export
 class ZethusWidget extends DocumentWidget<Widget> {
@@ -55,29 +140,39 @@ class ZethusWidget extends DocumentWidget<Widget> {
     constructor(options: DocumentWidget.IOptions<Widget>) {
         super({ ...options });
         this.context = options['context'];
-
-        // this._onTitleChanged();
-        // this.context.pathChanged.connect(this._onTitleChanged, this);
+        this._onTitleChanged();
+        this.context.pathChanged.connect(this._onTitleChanged, this);
         this.context.ready.then(() => { this._onContextReady(); });
         // this.context.ready.then(() => { this._handleDirtyStateNew(); });
     }
 
-    protected onAfterShow(msg: Message): void {
-        // this._loadEditor(this.node);
-        const editor_value = this.context.model.toString();
-        let state = JSON.parse(editor_value);
-        console.log(state);
-        ReactDOM.render(React.createElement(Zethus, state), this.node);
+    protected loadEditor(state: any): void {
+        this.react_elem = ReactDOM.render(React.createElement(Zethus, {configuration: state}), this.node);
+        let cvx = this.node.querySelector('canvas');
+        cvx.width = this.node.clientWidth; //  = msg.width;
+        cvx.height = this.node.clientHeight; // = msg.height;
+        cvx.style.width = this.node.clientWidth + 'px';
+        cvx.style.height = this.node.clientHeight + 'px';
+    }
+
+    protected onResize(msg: Widget.ResizeMessage): void {
+      let cvx = this.node.querySelector('canvas');
+      cvx.width  = msg.width;
+      cvx.height = msg.height;
+      cvx.style.width = msg.width + 'px';
+      cvx.style.height = msg.height + 'px';
     }
 
     public getSVG() : string {
         return "nothing";
-        // return mx.mxUtils.getXml(this._editor.editor.graph.getSvg());
     }
 
     private _onContextReady() : void {
-        // const contextModel = this.context.model;
-
+        const contextModel = this.context.model;
+        if (this.context.model.toString() == '')
+        {
+            this.context.model.fromString(default_config);
+        }
         // // Set the editor model value.
         this._onContentChanged();
 
@@ -89,19 +184,7 @@ class ZethusWidget extends DocumentWidget<Widget> {
 
         // this._editor.refresh();
 
-        // if (footer.length)
-        // {
-        //     this._editor.footerHeight = 0;
-        //     for (let i = 0; i < footer.length; i++)
-        //     {
-        //         let f = footer[i] as HTMLElement;
-        //         f.style.height = '0px';
-        //         f.style.display = 'none';
-        //     }
-        //     this._editor.refresh();
-        // }
-
-        // this._ready.resolve(void 0);
+        this._ready.resolve(void 0);
     }
 
     private _loadEditor(node: HTMLElement, contents?: string): void {
@@ -111,26 +194,19 @@ class ZethusWidget extends DocumentWidget<Widget> {
      * Handle a change to the title.
      */
     private _onTitleChanged(): void {
-        // this.title.label = PathExt.basename(this.context.localPath);
+        this.title.label = PathExt.basename(this.context.localPath);
     }
 
     private _onContentChanged() : void {
-        // if (this._editor === undefined)
-        // {
-        //     return;
-        // }
-
-        // const oldValue = mx.mxUtils.getXml(this._editor.editor.getGraphXml());
-        const editor_value = this.context.model.toString();
-        let state = JSON.parse(editor_value);
-        console.log(state);
-        // if (oldValue !== newValue && !this._editor.editor.graph.isEditing()) {
-        //     if (newValue.length)
-        //     {
-        //         let xml = mx.mxUtils.parseXml(newValue);
-        //         this._editor.editor.setGraphXml(xml.documentElement);
-        //     }
-        // }
+        try {
+            const editor_value = this.context.model.toString();
+            let state = JSON.parse(editor_value);
+            console.log("Loading editro from content chagned!")
+            this.loadEditor(state);
+        }
+        catch (e) {
+            // maybe empty string/
+        }
     }
 
     private _saveToContext() : void {
@@ -157,12 +233,14 @@ class ZethusWidget extends DocumentWidget<Widget> {
     }
 
     /**
-     * A promise that resolves when the csv viewer is ready.
+     * A promise that resolves when the zethus viewer is ready.
      */
     get ready(): Promise<void> {
         return this._ready.promise;
     }
 
+    private react_elem: any;
+    private _is_rendered: boolean;
     public content: Widget;
     public toolbar: Toolbar;
     public revealed: Promise<void>;

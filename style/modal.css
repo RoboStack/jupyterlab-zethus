@@ -20,10 +20,9 @@ button, select {
   font-size: inherit;
   font-family: inherit;
   outline: 0; }
-
-input:active,
-button:active, select:active {
-  outline: 0; }
+  input:active,
+  button:active, select:active {
+    outline: 0; }
 
 .halfWidth {
   width: 50%; }
@@ -49,16 +48,13 @@ button:active, select:active {
   border-radius: 4px;
   padding: 0 8px;
   font-size: inherit; }
-
-.input.wide {
-  width: 400px; }
-
-.input:active, .input:focus {
-  outline-width: 0;
-  border: 1px solid #013c89; }
-
-.input.error {
-  border: 1px solid #dc1d30; }
+  .input.wide {
+    width: 400px; }
+  .input:active, .input:focus {
+    outline-width: 0;
+    border: 1px solid #013c89; }
+  .input.error {
+    border: 1px solid #dc1d30; }
 
 button {
   cursor: pointer; }
@@ -101,15 +97,16 @@ input[disabled] {
   margin: 0;
   border-bottom: 1px solid #dddddd; }
 
-#wrapper {
+#zethus-wrapper {
   display: flex;
   background-color: #000;
-  width: 100%;
+  width: 100vw;
   height: 100vh;
   overflow-y: hidden; }
 
-#viewport {
+#zethus-viewport {
   width: 100%;
+  flex-grow: 1;
   height: 100%;
   position: relative; }
 
@@ -121,5 +118,119 @@ input[disabled] {
   color: white;
   background-color: #dc1d30;
   font-size: 16px; }
+  .btn-primary[disabled] {
+    background-color: #dddddd; }
 
-/*# sourceMappingURL=modal.scss.map */
+#zethus-content {
+  width: 0;
+  flex-grow: 1;
+  flex-shrink: 1; }
+
+.zethus-modal-wrapper {
+  position: absolute;
+  z-index: 1000;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, 0.9); }
+
+.zethus-modal-contents {
+  width: 1000px;
+  margin: 100px auto;
+  height: 600px;
+  background-color: #ffffff;
+  box-shadow: 0 0 40px rgba(0, 0, 0, 0.08);
+  border-radius: 8px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column; }
+  .zethus-modal-contents .modal-title {
+    margin-bottom: 6px;
+    margin-top: 0; }
+
+.zethus-type-container {
+  display: flex;
+  flex-grow: 1;
+  overflow: hidden; }
+  .zethus-type-container .zethus-type-selection {
+    flex: 1 0 50%;
+    overflow-y: auto; }
+  .zethus-type-container .zethus-type-info {
+    border-left: 1px solid #dddddd;
+    padding: 0 0 0 20px;
+    flex: 1 0 50%;
+    overflow-y: auto; }
+    .zethus-type-container .zethus-type-info h4 {
+      margin-top: 10px;
+      margin-bottom: 8px;
+      font-size: 22px; }
+    .zethus-type-container .zethus-type-info img {
+      max-width: 100%; }
+    .zethus-type-container .zethus-type-info > div {
+      margin-bottom: 8px; }
+
+.zethus-addVizForm {
+  display: flex;
+  flex-grow: 1;
+  flex-shrink: 1;
+  height: 0;
+  flex-direction: column; }
+
+.zethus-modal-actions {
+  display: flex;
+  flex-shrink: 0;
+  padding: 10px 0 0; }
+  .zethus-modal-actions button {
+    margin-left: 10px; }
+
+.zethus-tabs-header {
+  border-bottom: 1px solid #dddddd;
+  flex-shrink: 0; }
+
+.zethus-tabs-button {
+  margin: 0 10px -1px;
+  background-color: transparent;
+  border: 1px solid #dddddd;
+  border-bottom: 1px solid #dddddd;
+  border-radius: 4px 4px 0 0;
+  color: inherit;
+  padding: 5px 10px 10px; }
+  .zethus-tabs-button.selected {
+    border: 1px solid #dddddd;
+    border-bottom: 1px solid #fff; }
+
+.zethus-typeRow, .zethus-topicRow {
+  text-align: left;
+  width: 100%;
+  font-size: 16px;
+  border: 0;
+  background: transparent;
+  padding: 10px 10px 10px 30px;
+  display: flex;
+  align-items: center; }
+  .zethus-typeRow .reactSelect, .zethus-topicRow .reactSelect {
+    color: #444444; }
+  .zethus-typeRow:hover, .zethus-topicRow:hover {
+    color: #dc1d30;
+    background-color: #f6f6f6; }
+    .zethus-typeRow:hover .reactSelect, .zethus-topicRow:hover .reactSelect {
+      color: #444444; }
+  .zethus-typeRow.selected, .zethus-topicRow.selected {
+    color: #dc1d30;
+    background-color: #f6f6f6; }
+  .zethus-typeRow.inactive, .zethus-topicRow.inactive {
+    opacity: 0.2;
+    cursor: not-allowed; }
+
+.zethus-topicRow {
+  padding-left: 10px; }
+
+.zethus-typeUnsupported {
+  padding: 10px;
+  opacity: 0.4;
+  cursor: not-allowed; }
+
+.zethus-typeEmpty {
+  padding-left: 30px;
+  font-style: italic; }

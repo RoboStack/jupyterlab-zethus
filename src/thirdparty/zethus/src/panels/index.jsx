@@ -6,6 +6,7 @@ import Amphion from 'amphion';
 
 import { DEFAULT_CONFIG, ROS_SOCKET_STATUSES } from '../utils';
 
+import { PanelWrapper, PanelContent } from '../components/styled';
 import AddModal from './addModal';
 import Sidebar from './sidebar';
 import Viewport from './viewer';
@@ -21,14 +22,22 @@ class Wrapper extends React.Component {
       rosStatus: ROS_SOCKET_STATUSES.INITIAL,
       addModalOpen: false,
       rosTopics: [],
+      rosParams: [],
+      framesList: [],
+      startConnectTime: undefined
     };
-    this.ros = new ROSLIB.Ros();
-    this.viewer = new Amphion.TfViewer(this.ros);
 
     this.connectRos = this.connectRos.bind(this);
     this.disconnectRos = this.disconnectRos.bind(this);
     this.toggleAddModal = this.toggleAddModal.bind(this);
+    this.refreshRosData = this.refreshRosData.bind(this);
     this.addVisualization = this.addVisualization.bind(this);
+    this.updateFramesList = this.updateFramesList.bind(this);
+
+    this.ros = new ROSLIB.Ros();
+    this.viewer = new Amphion.TfViewer(this.ros, {
+      onFramesListUpdate: this.updateFramesList,
+    });
   }
 
   static getDerivedStateFromProps({ configuration }) {
@@ -38,32 +47,34 @@ class Wrapper extends React.Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    const { rosEndpoint } = this.state;
+    const { rosEndpoint, startConnectTime } = this.state;
     if (prevState.rosEndpoint !== rosEndpoint) {
       this.disconnectRos();
+      startConnectTime = Date.now();
       this.connectRos();
     }
   }
 
   componentDidMount() {
-    const { rosEndpoint } = this.state;
+    const { rosEndpoint, startConnectTime } = this.state;
     this.ros.on('error', () => {
-      this.setState({
-        rosStatus: ROS_SOCKET_STATUSES.CONNECTION_ERROR,
-      });
+      // add a 20 second retry timeout
+      if ((Date.now() - startConnectTime) / 1000 > 20)
+      {
+        this.setState({
+          rosStatus: ROS_SOCKET_STATUSES.CONNECTION_ERROR,
+        });
+      } else {
+        // wait 1 second, and try again
+        setTimeout(() => {
+          if (rosEndpoint && this.state.rosStatus != ROS_SOCKET_STATUSES.CONNECTED) {
+            this.connectRos();
+          }
+        }, 1000);
+      }
     });
 
-    this.ros.on('connection', () => {
-      this.ros.getTopics(rosTopics => {
-        this.setState({
-          rosStatus: ROS_SOCKET_STATUSES.CONNECTED,
-          rosTopics: _.map(rosTopics.topics, (name, index) => ({
-            name,
-            messageType: rosTopics.types[index],
-          })),
-        });
-      });
-    });
+    this.ros.on('connection', this.refreshRosData);
 
     this.ros.on('close', () => {
       this.setState({
@@ -74,6 +85,27 @@ class Wrapper extends React.Component {
     if (rosEndpoint) {
       this.connectRos();
     }
+  }
+
+  updateFramesList(framesList) {
+    this.setState({
+      framesList: [...framesList],
+    });
+  }
+
+  refreshRosData() {
+    this.ros.getTopics(rosTopics => {
+      this.setState({
+        rosStatus: ROS_SOCKET_STATUSES.CONNECTED,
+        rosTopics: _.map(rosTopics.topics, (name, index) => ({
+          name,
+          messageType: rosTopics.types[index],
+        })),
+      });
+    });
+    this.ros.getParams(rosParams => {
+      this.setState({ rosParams: _.map(rosParams, p => _.trimStart(p, '/')) });
+    });
   }
 
   componentWillUnmount() {
@@ -101,10 +133,23 @@ class Wrapper extends React.Component {
     });
   }
 
-  addVisualization() {}
+  addVisualization(options) {
+    const { addVisualization } = this.props;
+    addVisualization(options);
+    this.setState({
+      addModalOpen: false,
+    });
+  }
 
   render() {
-    const { addModalOpen, rosStatus, rosTopics, rosEndpoint } = this.state;
+    const {
+      addModalOpen,
+      framesList,
+      rosStatus,
+      rosTopics,
+      rosParams,
+      rosEndpoint,
+    } = this.state;
     const {
       configuration: {
         panels: {
@@ -118,18 +163,23 @@ class Wrapper extends React.Component {
       updateVizOptions,
       updateGlobalOptions,
       updateRosEndpoint,
+      removeVisualization,
+      toggleVisibility,
     } = this.props;
     return (
-      <div id="wrapper">
+      <PanelWrapper>
         {addModalOpen && (
           <AddModal
+            ros={this.ros}
             rosTopics={rosTopics}
+            rosParams={rosParams}
             closeModal={this.toggleAddModal}
             addVisualization={this.addVisualization}
           />
         )}
         {displaySidebar && (
           <Sidebar
+            framesList={framesList}
             globalOptions={globalOptions}
             updateGlobalOptions={updateGlobalOptions}
             rosEndpoint={rosEndpoint}
@@ -140,13 +190,16 @@ class Wrapper extends React.Component {
             rosInstance={this.ros}
             updateVizOptions={updateVizOptions}
             updateRosEndpoint={updateRosEndpoint}
+            toggleAddModal={this.toggleAddModal}
+            removeVisualization={removeVisualization}
+            toggleVisibility={toggleVisibility}
           />
         )}
-        <div id="content">
+        <PanelContent>
           {displayTools && <Tools />}
           <Viewport viewer={this.viewer} globalOptions={globalOptions} />
           {displayInfo && <Info />}
-        </div>
+        </PanelContent>
         {_.map(visualizations, vizItem => (
           <Visualization
             options={vizItem}
@@ -156,7 +209,7 @@ class Wrapper extends React.Component {
             rosInstance={this.ros}
           />
         ))}
-      </div>
+      </PanelWrapper>
     );
   }
 }

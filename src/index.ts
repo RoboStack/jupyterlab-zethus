@@ -1,9 +1,9 @@
 // Copyright 2018 Wolf Vollprecht
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// 
+//
 //     http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
@@ -17,7 +17,7 @@ import {
 } from '@jupyterlab/application';
 
 import {
-  ICommandPalette, WidgetTracker, IWidgetTracker
+  ICommandPalette, WidgetTracker, IWidgetTracker, MainAreaWidget
 } from '@jupyterlab/apputils';
 
 import {
@@ -31,6 +31,14 @@ import {
 import {
   IMainMenu
 } from '@jupyterlab/mainmenu';
+
+import {
+  ITerminal
+} from '@jupyterlab/terminal';
+
+import {
+  PathExt
+} from '@jupyterlab/coreutils';
 
 import {
   Token
@@ -47,10 +55,10 @@ import {
  */
 const FACTORY = 'Zethus';
 
-interface IZethusTracker extends IWidgetTracker<ZethusWidget> {}
+interface IZethusTracker extends IWidgetTracker<ZethusWidget> { }
 
 export
-const IZethusTracker = new Token<IZethusTracker>('zethus/tracki');
+  const IZethusTracker = new Token<IZethusTracker>('zethus/tracki');
 
 /**
  * The editor tracker extension.
@@ -67,12 +75,12 @@ const plugin: JupyterFrontEndPlugin<IZethusTracker> = {
 export default plugin;
 
 function activate(app: JupyterLab,
-                  browserFactory: IFileBrowserFactory,
-                  restorer: ILayoutRestorer,
-                  menu: IMainMenu,
-                  palette: ICommandPalette,
-                  launcher: ILauncher | null
-    ): IZethusTracker {
+  browserFactory: IFileBrowserFactory,
+  restorer: ILayoutRestorer,
+  menu: IMainMenu,
+  palette: ICommandPalette,
+  launcher: ILauncher | null
+): IZethusTracker {
 
   const namespace = 'zethus';
   const factory = new ZethusFactory({ name: FACTORY, fileTypes: ['zethus'], defaultFor: ['zethus'] });
@@ -84,8 +92,68 @@ function activate(app: JupyterLab,
    */
   function isEnabled(): boolean {
     return tracker.currentWidget !== null &&
-           tracker.currentWidget === app.shell.currentWidget;
+      tracker.currentWidget === app.shell.currentWidget;
   }
+
+  // from the git extension
+  function findCurrentFileBrowserPath(): [string, string] {
+    try {
+      let selected_element = browserFactory.defaultBrowser.selectedItems().next();
+      return [browserFactory.defaultBrowser.model.path, selected_element.path];
+    } catch (err) {}
+  }
+
+  console.log(app)
+
+  commands.addCommand("zethus:launch-simulation", {
+    execute: async (args) => {
+
+      // const widget = tracker.currentWidget;
+      // console.log(widget);
+      // if (!widget) {
+      //   return;
+      // }
+      // console.log(widget.selectedItems())
+
+      const main = (await commands.execute(
+        'terminal:create-new',
+        args
+      )) as MainAreaWidget<ITerminal.ITerminal>;
+
+      const terminal = main.content;
+      let currentFile = findCurrentFileBrowserPath();
+
+      const scnd = commands.execute('docmanager:open', {
+        path: currentFile[1], factory: FACTORY
+      });
+
+      try {
+        terminal.session.send({
+          type: 'stdin',
+          content: [
+            'cd "' + PathExt.basename(currentFile[0]) + '"\n' + "PATH=$(getconf PATH):/usr/local/bin && unset PYTHONPATH && source ~/catkin_ws/devel/setup.bash\n" + "roslaunch test.launch\n"
+          ]
+        });
+        return main;
+      } catch (e) {
+        console.error(e);
+        main.dispose();
+      }
+    },
+    isVisible: () => {
+      return true;
+    },
+    label: 'Launch Simulation'
+  }
+  );
+
+  const zethusCSSSelector = '.jp-DirListing-item[title$=".zethus"]'
+
+  app.contextMenu.addItem({
+    command: "zethus:launch-simulation",
+    selector: zethusCSSSelector,
+    rank: 1
+  });
 
   // Handle state restoration.
   restorer.restore(tracker, {
@@ -115,6 +183,15 @@ function activate(app: JupyterLab,
     });
   };
 
+  app.docRegistry.addFileType({
+    name: 'zethus',
+    displayName: 'Diagram',
+    mimeTypes: ['application/zethus'],
+    extensions: ['.zethus'],
+    iconClass: 'jp-MaterialIcon jp-ImageIcon',
+    fileFormat: 'text'
+  });
+
   // const createNewSVG = (cwd: string) => {
   //   return commands.execute('docmanager:new-untitled', {
   //     path: cwd, type: 'file', ext: '.svg'
@@ -127,8 +204,8 @@ function activate(app: JupyterLab,
   // };
 
   // Add a command for creating a new diagram file.
-  commands.addCommand('drawio:create-new', {
-    label: 'Diagram',
+  commands.addCommand('zethus:create-new', {
+    label: 'Robot',
     iconClass: 'jp-MaterialIcon jp-ImageIcon',
     caption: 'Create a new zethus file',
     execute: () => {

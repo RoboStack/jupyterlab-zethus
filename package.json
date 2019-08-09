@@ -38,8 +38,10 @@
     "@jupyterlab/filebrowser": "^1.0.0",
     "@jupyterlab/launcher": "^1.0.0",
     "@jupyterlab/mainmenu": "^1.0.0",
+    "@jupyterlab/terminal": "^1.0.0",
     "roslib": "github:RoboStack/roslibjs#remove_ws",
-    "zethus": "^0.1.9"
+    "zethus": "git+https://github.com/rapyuta-robotics/zethus.git",
+    "amphion": "git+https://github.com/rapyuta-robotics/amphion.git"
   },
   "devDependencies": {
     "@phosphor/messaging": "^1.1.0",

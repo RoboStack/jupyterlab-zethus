@@ -1,5 +1,12 @@
-import React from 'react';
 import _ from 'lodash';
+import React from 'react';
+import {
+  VizImageClose,
+  VizImageContainer,
+  VizImageHeader,
+  VizImageName,
+} from './styled/viz';
+import { FlexGrow } from './styled';
 
 class DraggableImage extends React.Component {
   constructor(props) {
@@ -7,8 +14,8 @@ class DraggableImage extends React.Component {
 
     this.elementRef = React.createRef();
 
-    this.mouseDown = { x: 0, y: 0 };
     this.divMouseDown = { left: 0, top: 0 };
+    this.mouseDown = { x: 0, y: 0 };
 
     this.hide = this.hide.bind(this);
     this.moveDiv = this.moveDiv.bind(this);
@@ -28,8 +35,8 @@ class DraggableImage extends React.Component {
 
   hide() {
     const {
-      viz: { id, rosObject },
       updateVisibilty,
+      viz: { id, rosObject },
     } = this.props;
 
     updateVisibilty(id, false);
@@ -78,20 +85,16 @@ class DraggableImage extends React.Component {
     }
 
     return (
-      <div
-        ref={this.elementRef}
-        className="vizImageContainer"
-        onMouseUp={this.onMouseUp}
-      >
-        <div className="vizImageHeader" onMouseDown={this.onMouseDown}>
-          <div className="vizImageName">{name}</div>
-          <div className="flexGrow" />
-          <button type="button" className="vizImageClose" onClick={this.hide}>
+      <VizImageContainer ref={this.elementRef} onMouseUp={this.onMouseUp}>
+        <VizImageHeader onMouseDown={this.onMouseDown}>
+          <VizImageName>{name}</VizImageName>
+          <FlexGrow />
+          <VizImageClose type="button" onClick={this.hide}>
             CLOSE
-          </button>
-        </div>
+          </VizImageClose>
+        </VizImageHeader>
         <canvas />
-      </div>
+      </VizImageContainer>
     );
   }
 }

@@ -3,11 +3,22 @@ import _ from 'lodash';
 
 import { ROS_SOCKET_STATUSES, vizOptions } from '../../utils';
 import GlobalOptions from './globalOptions';
+import {
+  ButtonPrimary,
+  Container,
+  Input,
+  InputLabel,
+  Separator,
+  FlexSpace,
+  Flex,
+  StyledSidebar,
+  StyledLogo,
+} from '../../components/styled';
 import ConnectionDot from '../../components/connectionDot';
 
-// import '../../styles/sidebar.scss';
 import Logo from '../../components/logo';
 import VizOptions from './vizOptions';
+import { RosStatus, SidebarVizContainer } from '../../components/styled/viz';
 
 class Sidebar extends React.Component {
   constructor(props) {
@@ -34,6 +45,7 @@ class Sidebar extends React.Component {
 
   render() {
     const {
+      framesList,
       globalOptions,
       rosStatus,
       visualizations,
@@ -43,54 +55,52 @@ class Sidebar extends React.Component {
       rosInstance,
       updateVizOptions,
       updateGlobalOptions,
+      removeVisualization,
+      toggleVisibility,
     } = this.props;
 
     const { rosInput } = this.state;
     return (
-      <div id="sidebar">
-        <div className="container" id="logo">
+      <StyledSidebar>
+        <StyledLogo>
           <Logo />
-        </div>
-        <hr className="separator" />
-        <div className="container">
-          <div id="rosStatus" className="flex">
+        </StyledLogo>
+        <Separator />
+        <Container>
+          <RosStatus>
             <ConnectionDot status={rosStatus} />
             <span>{rosStatus}</span>
-          </div>
+          </RosStatus>
           <form onSubmit={this.onSubmit}>
-            <div className="inputLabel">ROS Endpoint</div>
-            <div className="flex">
-              <input
+            <InputLabel>ROS Endpoint</InputLabel>
+            <Flex>
+              <Input
                 type="text"
-                className="input"
                 value={rosInput}
                 onChange={this.updateRosInput}
               />
-              <div className="flexSpace" />
-              <button className="btn-primary" type="submit">
+              <FlexSpace />
+              <ButtonPrimary type="submit">
                 {rosStatus === ROS_SOCKET_STATUSES.CONNECTED
                   ? 'Disconnect'
                   : 'Connect'}
-              </button>
-            </div>
+              </ButtonPrimary>
+            </Flex>
           </form>
-        </div>
-        <hr className="separator" />
+        </Container>
+        <Separator />
         {rosStatus === ROS_SOCKET_STATUSES.CONNECTED && (
           <React.Fragment>
             <GlobalOptions
+              framesList={framesList}
               globalOptions={globalOptions}
               updateGlobalOptions={updateGlobalOptions}
             />
-            <hr className="separator" />
-            <div className="container" id="sidebarVizContainer">
-              <button
-                type="button"
-                className="btn-primary"
-                onClick={toggleAddModal}
-              >
+            <Separator />
+            <SidebarVizContainer>
+              <ButtonPrimary type="button" onClick={toggleAddModal}>
                 Add Visualization
-              </button>
+              </ButtonPrimary>
               {_.size(visualizations) === 0 && (
                 <p>No visualizations added to the scene</p>
               )}
@@ -114,13 +124,15 @@ class Sidebar extends React.Component {
                     vizObject={vizObject}
                     rosInstance={rosInstance}
                     updateVizOptions={updateVizOptions}
+                    removeVisualization={removeVisualization}
+                    toggleVisibility={toggleVisibility}
                   />
                 );
               })}
-            </div>
+            </SidebarVizContainer>
           </React.Fragment>
         )}
-      </div>
+      </StyledSidebar>
     );
   }
 }

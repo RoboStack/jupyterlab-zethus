@@ -97,15 +97,16 @@ input[disabled] {
   margin: 0;
   border-bottom: 1px solid #dddddd; }
 
-#wrapper {
+#zethus-wrapper {
   display: flex;
   background-color: #000;
-  width: 100%;
+  width: 100vw;
   height: 100vh;
   overflow-y: hidden; }
 
-#viewport {
+#zethus-viewport {
   width: 100%;
+  flex-grow: 1;
   height: 100%;
   position: relative; }
 
@@ -117,6 +118,13 @@ input[disabled] {
   color: white;
   background-color: #dc1d30;
   font-size: 16px; }
+  .btn-primary[disabled] {
+    background-color: #dddddd; }
+
+#zethus-content {
+  width: 0;
+  flex-grow: 1;
+  flex-shrink: 1; }
 
 @keyframes twinkle {
   from,
@@ -148,40 +156,43 @@ input[disabled] {
     opacity: 0; }
   50% {
     opacity: 1; } }
-#logo {
+#zethus-logo svg {
   height: 40px;
   display: block; }
 
-#sidebar {
+#zethus-sidebar {
   background-color: #fff;
   width: 400px;
   display: flex;
   flex-direction: column;
   flex-shrink: 0; }
 
-#rosStatus {
+#zethus-rosStatus {
   margin-bottom: 10px;
   align-items: center; }
 
-#rosStatusIndicator {
+#zethus-sidebarVizContainer {
+  overflow-y: auto; }
+
+#zethus-rosStatusIndicator {
   width: 8px;
   height: 8px;
   background-color: #000000;
   border-radius: 4px;
   margin: 0 10px -2px 0; }
-  #rosStatusIndicator.connected {
+  #zethus-rosStatusIndicator.connected {
     background-color: #3e991c; }
-  #rosStatusIndicator.connecting {
+  #zethus-rosStatusIndicator.connecting {
     background-color: #f9c351;
     animation: twinkle normal 1s infinite ease-in-out; }
-  #rosStatusIndicator.error {
+  #zethus-rosStatusIndicator.error {
     background-color: #ff3e3c; }
 
-.optionRow {
+.zethus-optionRow {
   display: flex;
   min-height: 30px;
   align-items: center;
   padding: 3px 0;
   font-size: 0.7rem; }
-  .optionRow .input {
+  .zethus-optionRow .input {
     height: 26px; }
