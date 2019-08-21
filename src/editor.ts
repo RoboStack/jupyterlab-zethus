@@ -17,11 +17,6 @@ import React from 'react';
 
 import Zethus from './thirdparty/zethus/src/zethus';
 
-import "../style/common.css";
-import "../style/sidebar.css";
-import "../style/viewport.css";
-import "../style/modal.css";
-
 import {
   ABCWidgetFactory, DocumentRegistry,  DocumentWidget,
 } from '@jupyterlab/docregistry';
