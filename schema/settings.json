@@ -1,0 +1,16 @@
+{
+  "jupyter.lab.setting-icon-class": "ZethusIcon",
+  "jupyter.lab.setting-icon-label": "Zethus Settings",
+  "title": "Zethus Settings",
+  "description": "Zethus Extension Settings",
+  "properties": {
+    "defaultROSEndpoint": {
+      "title": "Default ROS Endpoint",
+      "description": "Websocket URL to the default ROS endpoint",
+      "default": "ws://localhost:9090",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "type": "object"
+}
