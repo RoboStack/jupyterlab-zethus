@@ -11,8 +11,10 @@ import { DEFAULT_CONFIG } from './utils';
 class Zethus extends React.Component {
   constructor(props) {
     super(props);
+    const providedConfig =
+      props.configuration || store.get('zethus_config') || {};
     this.state = {
-      ...(props.configuration || store.get('zethus_config') || DEFAULT_CONFIG),
+      ..._.merge({}, DEFAULT_CONFIG, providedConfig),
     };
     this.updateVizOptions = this.updateVizOptions.bind(this);
     this.updateRosEndpoint = this.updateRosEndpoint.bind(this);
@@ -63,6 +65,7 @@ class Zethus extends React.Component {
       visualizations: _.filter(visualizations, v => v.key !== vizId),
     });
   }
+
   toggleVisibility(e) {
     const {
       dataset: { id: vizId },

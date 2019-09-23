@@ -37,7 +37,7 @@ import {
 } from '@jupyterlab/terminal';
 
 import {
-  PathExt
+  PathExt, ISettingRegistry
 } from '@jupyterlab/coreutils';
 
 import {
@@ -48,7 +48,11 @@ import {
   ZethusWidget, ZethusFactory
 } from './editor';
 
-(window as any).ws = WebSocket;
+import {
+  Mode
+} from '@jupyterlab/codemirror'
+
+import "../style/index.css"
 
 /**
  * The name of the factory that creates editor widgets.
@@ -65,8 +69,8 @@ export
  */
 const plugin: JupyterFrontEndPlugin<IZethusTracker> = {
   activate,
-  id: '@jupyterlab/zethus-extension:plugin',
-  requires: [IFileBrowserFactory, ILayoutRestorer, IMainMenu, ICommandPalette],
+  id: '@jupyterlab/zethus:plugin',
+  requires: [IFileBrowserFactory, ILayoutRestorer, IMainMenu, ICommandPalette, ISettingRegistry],
   optional: [ILauncher],
   provides: IZethusTracker,
   autoStart: true
@@ -79,73 +83,39 @@ function activate(app: JupyterLab,
   restorer: ILayoutRestorer,
   menu: IMainMenu,
   palette: ICommandPalette,
+  settingRegistry: ISettingRegistry,
   launcher: ILauncher | null
 ): IZethusTracker {
 
   const namespace = 'zethus';
-  const factory = new ZethusFactory({ name: FACTORY, fileTypes: ['zethus'], defaultFor: ['zethus'] });
   const { commands } = app;
   const tracker = new WidgetTracker<ZethusWidget>({ namespace });
 
+  let defaultROSEndpoint = "";
+  let factory = new ZethusFactory({ name: FACTORY, fileTypes: ['zethus'], defaultFor: ['zethus'] }, defaultROSEndpoint);
+
+  const updateSettings = (settings: ISettingRegistry.ISettings): void => {
+    defaultROSEndpoint = settings.get("defaultROSEndpoint").composite as string;
+    factory = new ZethusFactory({ name: FACTORY, fileTypes: ['zethus'], defaultFor: ['zethus'] }, defaultROSEndpoint);
+  };
+
+  Promise.all([settingRegistry.load('@jupyterlab/zethus:settings'), app.restored])
+    .then(([settings]) => {
+      updateSettings(settings);
+      settings.changed.connect(updateSettings);
+    })
+    .catch((reason: Error) => {
+      console.error(reason.message);
+    });
+
+
   /**
-   * Whether there is an active DrawIO editor.
+   * Whether there is an active Zethus viewer.
    */
   function isEnabled(): boolean {
     return tracker.currentWidget !== null &&
       tracker.currentWidget === app.shell.currentWidget;
   }
-
-  // from the git extension
-  function findCurrentFileBrowserPath(): [string, string] {
-    try {
-      let selected_element = browserFactory.defaultBrowser.selectedItems().next();
-      return [browserFactory.defaultBrowser.model.path, selected_element.path];
-    } catch (err) {}
-  }
-
-  console.log(app)
-
-  commands.addCommand("zethus:launch-simulation", {
-    execute: async (args) => {
-
-      // const widget = tracker.currentWidget;
-      // console.log(widget);
-      // if (!widget) {
-      //   return;
-      // }
-      // console.log(widget.selectedItems())
-
-      const main = (await commands.execute(
-        'terminal:create-new',
-        args
-      )) as MainAreaWidget<ITerminal.ITerminal>;
-
-      const terminal = main.content;
-      let currentFile = findCurrentFileBrowserPath();
-
-      const scnd = commands.execute('docmanager:open', {
-        path: currentFile[1], factory: FACTORY
-      });
-
-      try {
-        terminal.session.send({
-          type: 'stdin',
-          content: [
-            'cd "' + PathExt.basename(currentFile[0]) + '"\n' + "PATH=$(getconf PATH):/usr/local/bin && unset PYTHONPATH && source ~/catkin_ws/devel/setup.bash\n" + "roslaunch test.launch\n"
-          ]
-        });
-        return main;
-      } catch (e) {
-        console.error(e);
-        main.dispose();
-      }
-    },
-    isVisible: () => {
-      return true;
-    },
-    label: 'Launch Simulation'
-  }
-  );
 
   const zethusCSSSelector = '.jp-DirListing-item[title$=".zethus"]'
 
@@ -163,7 +133,7 @@ function activate(app: JupyterLab,
   });
 
   factory.widgetCreated.connect((sender, widget) => {
-    widget.title.icon = 'jp-MaterialIcon jp-ImageIcon'; // TODO change
+    widget.title.icon = 'jp-MaterialIcon ZethusIcon'; // TODO change
 
     // Notify the instance tracker if restore data needs to update.
     widget.context.pathChanged.connect(() => { tracker.save(widget); });
@@ -173,7 +143,7 @@ function activate(app: JupyterLab,
 
   // Function to create a new untitled diagram file, given
   // the current working directory.
-  const createNewDIO = (cwd: string) => {
+  const createNewZethus = (cwd: string) => {
     return commands.execute('docmanager:new-untitled', {
       path: cwd, type: 'file', ext: '.zethus'
     }).then(model => {
@@ -185,42 +155,30 @@ function activate(app: JupyterLab,
 
   app.docRegistry.addFileType({
     name: 'zethus',
-    displayName: 'Diagram',
-    mimeTypes: ['application/zethus'],
+    displayName: 'Zethus File',
+    mimeTypes: ['application/json'],
     extensions: ['.zethus'],
-    iconClass: 'jp-MaterialIcon jp-ImageIcon',
+    iconClass: 'jp-MaterialIcon ZethusIcon',
     fileFormat: 'text'
   });
 
-  // const createNewSVG = (cwd: string) => {
-  //   return commands.execute('docmanager:new-untitled', {
-  //     path: cwd, type: 'file', ext: '.svg'
-  //   }).then(model => {
-  //     let wdg = app.shell.currentWidget as any;
-  //     model.content = wdg.getSVG();
-  //     model.format = 'text'
-  //     app.serviceManager.contents.save(model.path, model);
-  //   });
-  // };
-
-  // Add a command for creating a new diagram file.
-  commands.addCommand('zethus:create-new', {
-    label: 'Robot',
-    iconClass: 'jp-MaterialIcon jp-ImageIcon',
-    caption: 'Create a new zethus file',
-    execute: () => {
-      let cwd = browserFactory.defaultBrowser.model.path;
-      return createNewDIO(cwd);
-    }
+  app.docRegistry.addFileType({
+    name: 'roslaunch',
+    displayName: 'ROS Launch File',
+    mimeTypes: ['application/xml'],
+    extensions: ['.launch'],
+    iconClass: 'jp-MaterialIcon ROSLaunchIcon',
+    fileFormat: 'text'
   });
 
   commands.addCommand('zethus:launch', {
-    label: 'Launch Zethus',
-    caption: 'Launch the robot viewer',
+    label: 'ZETHUS',
+    iconClass: 'jp-MaterialIcon ZethusIcon',
+    caption: 'Launch the Zethus viewer',
     execute: () => {
       // console.log("Launching.");
       let cwd = browserFactory.defaultBrowser.model.path;
-      return createNewDIO(cwd);
+      return createNewZethus(cwd);
     },
     isEnabled
   });
@@ -230,9 +188,17 @@ function activate(app: JupyterLab,
     launcher.add({
       command: 'zethus:launch',
       rank: 1,
-      category: 'Other'
+      category: 'Robotics'
     });
   }
+
+  Mode.getModeInfo().push({
+    name: "ROS Launch", mime: "application/xml", mode: "xml", ext: ["launch"]
+  });
+
+  Mode.getModeInfo().push({
+    name: "Zethus", mime: "application/json", mode: "json", ext: ["zethus"]
+  })
 
   return tracker;
 }

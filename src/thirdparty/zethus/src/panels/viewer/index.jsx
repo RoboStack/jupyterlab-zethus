@@ -20,21 +20,27 @@ class Viewport extends React.PureComponent {
   constructor(props) {
     super(props);
     this.container = React.createRef();
+
+    this.updateViewerOptions = this.updateViewerOptions.bind(this);
   }
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate() {
+    this.updateViewerOptions();
+  }
+
+  updateViewerOptions() {
     const {
-      viewer,
       globalOptions: {
         backgroundColor: { value: backgroundColor },
+        fixedFrame: { value: selectedFrame },
         grid: {
-          size: gridSize,
-          divisions: gridDivisions,
-          color: gridColor,
           centerlineColor: gridCenterlineColor,
+          color: gridColor,
+          divisions: gridDivisions,
+          size: gridSize,
         },
-        fixedFrame: { value: fixedFrame },
       },
+      viewer,
     } = this.props;
     viewer.updateOptions({
       backgroundColor,
@@ -42,22 +48,15 @@ class Viewport extends React.PureComponent {
       gridDivisions,
       gridColor,
       gridCenterlineColor,
+      selectedFrame,
     });
-    if (fixedFrame !== prevProps.globalOptions.fixedFrame.value) {
-      viewer.updateSelectedFrame(fixedFrame);
-    }
   }
 
   componentDidMount() {
-    const {
-      viewer,
-      globalOptions: {
-        fixedFrame: { value: fixedFrame },
-      },
-    } = this.props;
+    const { viewer } = this.props;
     const container = this.container.current;
     viewer.setContainer(container);
-    viewer.updateSelectedFrame(fixedFrame);
+    this.updateViewerOptions();
     viewer.scene.stats.dom.id = 'viewportStats';
     container.appendChild(viewer.scene.stats.dom);
   }

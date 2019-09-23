@@ -15,7 +15,7 @@
 import ReactDOM from 'react-dom';
 import React from 'react';
 
-import Zethus from './thirdparty/zethus/src/zethus';
+import Zethus from "./thirdparty/zethus/src/zethus";
 
 import {
   ABCWidgetFactory, DocumentRegistry,  DocumentWidget,
@@ -41,132 +41,58 @@ import {
   PromiseDelegate
 } from '@phosphor/coreutils';
 
-const DIRTY_CLASS = 'jp-mod-dirty';
+import {
+  default_config
+} from "./default_config";
 
-const default_config = `{
-  "panels": {
-    "sidebar": {
-      "display": true
-    },
-    "tools": {
-      "display": false
-    },
-    "info": {
-      "display": false
-    }
-  },
-  "ros": {
-    "endpoint": "ws://localhost:9090"
-  },
-  "visualizations": [
-    {
-      "vizType": "RobotModel",
-      "topicName": "robot_description",
-      "messageType": "",
-      "name": "Robot",
-      "key": "10",
-      "visible": true,
-      "packages": {
-        "ur_description": "http://localhost:8888/ros_static/ur_description",
-        "robotiq_2f_85_gripper_visualization": "http://localhost:8888/ros_static/robotiq_2f_85_gripper_visualization"
-      }
-    },
-    {
-      "vizType": "PoseArray",
-      "topicName": "/pose_array_rosbag",
-      "messageType": "geometry_msgs/PoseArray",
-      "name": "Posearray",
-      "key": "9",
-      "visible": true
-    }
-  ],
-  "globalOptions": {
-    "display": true,
-    "backgroundColor": {
-      "display": true,
-      "value": [
-        28,
-        28,
-        28
-      ]
-    },
-    "fixedFrame": {
-      "display": true,
-      "value": "world"
-    },
-    "grid": {
-      "display": true,
-      "size": 3,
-      "count": 10,
-      "color": [
-        48,
-        48,
-        48
-      ]
-    }
-  },
-  "tools": {
-    "mode": "controls",
-    "controls": {
-      "display": false,
-      "enabled": true
-    },
-    "measure": {
-      "display": false
-    },
-    "custom": [
-      {
-        "name": "Nav goal",
-        "type": "publishPose",
-        "topic": "/navgoal"
-      },
-      {
-        "name": "Nav goal",
-        "type": "publishPoseWithCovariance",
-        "topic": "initialpose"
-      }
-    ]
-  }
-}`
+const DIRTY_CLASS = 'jp-mod-dirty';
 
 export
 class ZethusWidget extends DocumentWidget<Widget> {
 
-    constructor(options: DocumentWidget.IOptions<Widget>) {
+    constructor(options: DocumentWidget.IOptions<Widget>, defaultROSEndpoint: string) {
         super({ ...options });
         this.context = options['context'];
         this._onTitleChanged();
         this.context.pathChanged.connect(this._onTitleChanged, this);
         this.context.ready.then(() => { this._onContextReady(); });
+        this.defaultROSEndpoint = defaultROSEndpoint;
         // this.context.ready.then(() => { this._handleDirtyStateNew(); });
     }
 
     protected loadEditor(state: any): void {
-        this.react_elem = ReactDOM.render(React.createElement(Zethus, {configuration: state}), this.node);
+        let onUpdate = (prevProps: any, prevState: any) => {
+            console.log(this.react_elem.state);
+        }
+        this.react_elem = ReactDOM.render(React.createElement(Zethus, {configuration: state, componentDidUpdate: onUpdate}), this.node);
+        console.log(this.react_elem);
+
         let cvx = this.node.querySelector('canvas');
-        cvx.width = this.node.clientWidth; //  = msg.width;
-        cvx.height = this.node.clientHeight; // = msg.height;
-        cvx.style.width = this.node.clientWidth + 'px';
-        cvx.style.height = this.node.clientHeight + 'px';
+        if (cvx)
+        {
+            cvx.width = this.node.clientWidth; //  = msg.width;
+            cvx.height = this.node.clientHeight; // = msg.height;
+            cvx.style.width = this.node.clientWidth + 'px';
+            cvx.style.height = this.node.clientHeight + 'px';
+        }
     }
 
     protected onResize(msg: Widget.ResizeMessage): void {
       let cvx = this.node.querySelector('canvas');
-      cvx.width  = msg.width;
-      cvx.height = msg.height;
-      cvx.style.width = msg.width + 'px';
-      cvx.style.height = msg.height + 'px';
-    }
-
-    public getSVG() : string {
-        return "nothing";
+      if (cvx)
+      {
+          cvx.width  = msg.width;
+          cvx.height = msg.height;
+          cvx.style.width = msg.width + 'px';
+          cvx.style.height = msg.height + 'px';
+      }
     }
 
     private _onContextReady() : void {
         const contextModel = this.context.model;
         if (this.context.model.toString() == '')
         {
-            this.context.model.fromString(default_config);
+            this.context.model.fromString(default_config(this.defaultROSEndpoint));
         }
         // // Set the editor model value.
         this._onContentChanged();
@@ -227,6 +153,10 @@ class ZethusWidget extends DocumentWidget<Widget> {
         // }
     }
 
+    protected onBeforeDetach(msg: Message) {
+        ReactDOM.unmountComponentAtNode(this.node);
+    }
+
     /**
      * A promise that resolves when the zethus viewer is ready.
      */
@@ -242,6 +172,7 @@ class ZethusWidget extends DocumentWidget<Widget> {
     readonly context: DocumentRegistry.Context;
     private _editor : any;
     private _ready = new PromiseDelegate<void>();
+    private defaultROSEndpoint: string;
 }
 
 /**
@@ -252,11 +183,14 @@ class ZethusFactory extends ABCWidgetFactory<ZethusWidget, DocumentRegistry.IMod
     /**
     * Create a new widget given a context.
     */
-    constructor(options: DocumentRegistry.IWidgetFactoryOptions){
+    constructor(options: DocumentRegistry.IWidgetFactoryOptions, defaultROSEndpoint: string){
         super(options);
+        this.defaultROSEndpoint = defaultROSEndpoint;
     }
 
     protected createNewWidget(context: DocumentRegistry.Context): ZethusWidget {
-        return new ZethusWidget({context, content: new Widget()});
+        return new ZethusWidget({context, content: new Widget()}, this.defaultROSEndpoint);
     }
+
+    defaultROSEndpoint: string;
 }
