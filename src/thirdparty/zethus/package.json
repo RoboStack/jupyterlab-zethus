@@ -34,7 +34,7 @@
     "react-router-dom": "^5.0.1",
     "react-scripts": "^3.1.1",
     "react-select": "^3.0.4",
-    "roslib": "^1.0.1",
+    "roslib": "git+https://github.com/RoboStack/roslibjs#remove_ws",
     "shortid": "^2.2.15",
     "stats-js": "^1.0.1",
     "store": "^2.0.12",

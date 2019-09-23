@@ -41,7 +41,7 @@
     "@jupyterlab/mainmenu": "^1.0.0",
     "@jupyterlab/terminal": "^1.0.0",
     "@jupyterlab/codemirror": "^1.0.0",
-    "roslib": "github:RoboStack/roslibjs#remove_ws",
+    "roslib": "git+https://github.com/RoboStack/roslibjs#remove_ws",
     "zethus": "git+https://github.com/wolfv/zethus.git#add_simple_connect_retry",
     "amphion": "git+https://github.com/rapyuta-robotics/amphion.git#devel"
   },
@@ -55,7 +55,7 @@
     "typescript": "~3.5.2"
   },
   "resolutions": {
-    "roslib": "github:RoboStack/roslibjs#remove_ws",
+    "roslib": "git+https://github.com/RoboStack/roslibjs#remove_ws",
     "three": "^0.107.0",
     "@types/react": "~16.8.18"
   },
