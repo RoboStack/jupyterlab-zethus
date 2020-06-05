@@ -15,7 +15,8 @@
 import ReactDOM from 'react-dom';
 import React from 'react';
 
-import Zethus from "./thirdparty/zethus/src/zethus";
+// @ts-ignore
+import Zethus from "zethus/dist/panels";
 
 import {
   ABCWidgetFactory, DocumentRegistry,  DocumentWidget,
@@ -61,12 +62,8 @@ class ZethusWidget extends DocumentWidget<Widget> {
     }
 
     protected loadEditor(state: any): void {
-        let onUpdate = (prevProps: any, prevState: any) => {
-            console.log(this.react_elem.state);
-        }
-        this.react_elem = ReactDOM.render(React.createElement(Zethus, {configuration: state, componentDidUpdate: onUpdate}), this.node);
-        console.log(this.react_elem);
-
+        ReactDOM.render(React.createElement(Zethus, {configuration: state}), this.node);
+        
         let cvx = this.node.querySelector('canvas');
         if (cvx)
         {
@@ -97,7 +94,7 @@ class ZethusWidget extends DocumentWidget<Widget> {
         // // Set the editor model value.
         this._onContentChanged();
 
-        // contextModel.contentChanged.connect(this._onContentChanged, this);
+        contextModel.contentChanged.connect(this._onContentChanged, this);
         // contextModel.stateChanged.connect(this._onModelStateChangedNew, this);
 
         // this._editor.sidebarContainer.style.width = '208px';

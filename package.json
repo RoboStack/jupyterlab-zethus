@@ -34,16 +34,15 @@
   "dependencies": {
     "@jupyterlab/application": "^1.0.0",
     "@jupyterlab/apputils": "^1.0.0",
+    "@jupyterlab/codemirror": "^1.0.0",
     "@jupyterlab/coreutils": "^3.0.0",
     "@jupyterlab/docregistry": "^1.0.0",
     "@jupyterlab/filebrowser": "^1.0.0",
     "@jupyterlab/launcher": "^1.0.0",
     "@jupyterlab/mainmenu": "^1.0.0",
     "@jupyterlab/terminal": "^1.0.0",
-    "@jupyterlab/codemirror": "^1.0.0",
     "roslib": "git+https://github.com/RoboStack/roslibjs#remove_ws",
-    "zethus": "git+https://github.com/wolfv/zethus.git#add_simple_connect_retry",
-    "amphion": "git+https://github.com/rapyuta-robotics/amphion.git#devel"
+    "zethus": "^0.1.19"
   },
   "devDependencies": {
     "@phosphor/messaging": "^1.1.0",
