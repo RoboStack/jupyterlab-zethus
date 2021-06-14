@@ -30,10 +30,9 @@ import { default_config } from './default_config';
 
 // const DIRTY_CLASS = 'jp-mod-dirty';
 
-let zethusEditorId : number = 0;
+let zethusEditorId = 0;
 
 export class ZethusWidget extends DocumentWidget<Widget> {
-  
   constructor(
     options: DocumentWidget.IOptions<Widget>,
     defaultROSEndpoint: string
@@ -51,45 +50,43 @@ export class ZethusWidget extends DocumentWidget<Widget> {
     // this.context.ready.then(() => { this._handleDirtyStateNew(); });
   }
 
-  zethusId : number;
+  zethusId: number;
   iframe?: HTMLIFrameElement;
-  countSetConfig: number = 0;
+  countSetConfig = 0;
 
   protected loadEditor(state: any): void {
     const baseUrl = PageConfig.getBaseUrl();
-    if (!this.iframe)
-    {
+    if (!this.iframe) {
       this.iframe = document.createElement('iframe');
       this.iframe.style.width = '100%';
       this.iframe.style.height = '100%';
-  
-      let q = encodeURIComponent(JSON.stringify(state));
-  
-      this.iframe.src = baseUrl + `zethus/app/index.html?config=${q}&zethusId=${this.zethusId}`;
-  
+
+      const q = encodeURIComponent(JSON.stringify(state));
+
+      this.iframe.src =
+        baseUrl + `zethus/app/index.html?config=${q}&zethusId=${this.zethusId}`;
+
       this.content.node.appendChild(this.iframe);
 
-      window.document.addEventListener(`ZethusUpdateConfig${this.zethusId}`, (e: any) => {
-        if (this.countSetConfig <= 0)
-        {
-          this._saveToContext(e.detail.config);
-        }
-        else
-        {
-          this.countSetConfig--;
-        }
-      }, false)
-    }
-    else
-    {
+      window.document.addEventListener(
+        `ZethusUpdateConfig${this.zethusId}`,
+        (e: any) => {
+          if (this.countSetConfig <= 0) {
+            this._saveToContext(e.detail.config);
+          } else {
+            this.countSetConfig--;
+          }
+        },
+        false
+      );
+    } else {
       this.countSetConfig++;
-      let event = new CustomEvent(`SetConfig`, {detail: {config: state}});
+      const event = new CustomEvent('SetConfig', { detail: { config: state } });
       this.iframe.contentDocument?.dispatchEvent(event);
     }
   }
 
-  protected onResize(msg: Widget.ResizeMessage): void {
-  }
+  // protected onResize(msg: Widget.ResizeMessage): void {}
 
   private _onContextReady(): void {
     const contextModel = this.context.model;
@@ -122,8 +119,8 @@ export class ZethusWidget extends DocumentWidget<Widget> {
     }
   }
 
-  private _saveToContext(content: any) : void {
-    console.log("Saving content: ", content);
+  private _saveToContext(content: any): void {
+    console.log('Saving content: ', content);
     this.context.ready.then(() => {
       this.context.model.fromString(JSON.stringify(content, null, 4));
     });
