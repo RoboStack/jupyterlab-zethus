@@ -53,7 +53,7 @@ jobs:
         jlpm run eslint:check
         python -m pip install .
 
-        jupyter server extension list 2>&1 | grep -ie "jupyterlab-zethus.*OK"
+        jupyter server extension list 2>&1 | grep -ie "jupyterlab_zethus.*OK"
 
         jupyter labextension list 2>&1 | grep -ie "jupyterlab-zethus.*OK"
         python -m jupyterlab.browser_check
