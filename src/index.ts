@@ -56,7 +56,7 @@ export const IZethusTracker = new Token<IZethusTracker>('zethus/tracki');
  */
 const plugin: JupyterFrontEndPlugin<IZethusTracker> = {
   activate,
-  id: '@jupyterlab/zethus:plugin',
+  id: 'jupyterlab-zethus:plugin',
   requires: [IFileBrowserFactory, ILayoutRestorer, ISettingRegistry],
   optional: [ILauncher],
   provides: IZethusTracker,
@@ -100,7 +100,7 @@ function activate(
   };
 
   Promise.all([
-    settingRegistry.load('@jupyterlab/zethus:settings'),
+    settingRegistry.load('jupyterlab-zethus:settings'),
     app.restored
   ])
     .then(([settings]) => {
