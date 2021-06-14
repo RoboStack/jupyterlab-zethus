@@ -13,56 +13,43 @@
 // limitations under the License.
 
 import {
-  ILayoutRestorer, JupyterLab, JupyterFrontEndPlugin
+  ILayoutRestorer,
+  JupyterFrontEnd,
+  JupyterFrontEndPlugin
 } from '@jupyterlab/application';
 
-import {
-  ICommandPalette, WidgetTracker, IWidgetTracker, MainAreaWidget
-} from '@jupyterlab/apputils';
+import { WidgetTracker, IWidgetTracker } from '@jupyterlab/apputils';
 
-import {
-  IFileBrowserFactory
-} from '@jupyterlab/filebrowser';
+import { IFileBrowserFactory } from '@jupyterlab/filebrowser';
 
-import {
-  ILauncher
-} from '@jupyterlab/launcher';
+import { ILauncher } from '@jupyterlab/launcher';
 
-import {
-  IMainMenu
-} from '@jupyterlab/mainmenu';
+import { ISettingRegistry } from '@jupyterlab/settingregistry';
 
-import {
-  ITerminal
-} from '@jupyterlab/terminal';
+import { Token } from '@lumino/coreutils';
 
-import {
-  PathExt, ISettingRegistry
-} from '@jupyterlab/coreutils';
+import { ZethusWidget, ZethusFactory } from './editor';
 
-import {
-  Token
-} from '@phosphor/coreutils';
+import { Mode } from '@jupyterlab/codemirror';
 
-import {
-  ZethusWidget, ZethusFactory
-} from './editor';
+import { LabIcon } from '@jupyterlab/ui-components';
 
-import {
-  Mode
-} from '@jupyterlab/codemirror'
-
-import "../style/index.css"
+import '../style/index.css';
+import zethusIconSvg from '../style/icon.svg';
 
 /**
  * The name of the factory that creates editor widgets.
  */
 const FACTORY = 'Zethus';
 
-interface IZethusTracker extends IWidgetTracker<ZethusWidget> { }
+export const zethusIcon = new LabIcon({
+  name: 'jupyterlab-zethus:icon',
+  svgstr: zethusIconSvg
+});
 
-export
-  const IZethusTracker = new Token<IZethusTracker>('zethus/tracki');
+type IZethusTracker = IWidgetTracker<ZethusWidget>;
+
+export const IZethusTracker = new Token<IZethusTracker>('zethus/tracki');
 
 /**
  * The editor tracker extension.
@@ -70,7 +57,7 @@ export
 const plugin: JupyterFrontEndPlugin<IZethusTracker> = {
   activate,
   id: '@jupyterlab/zethus:plugin',
-  requires: [IFileBrowserFactory, ILayoutRestorer, IMainMenu, ICommandPalette, ISettingRegistry],
+  requires: [IFileBrowserFactory, ILayoutRestorer, ISettingRegistry],
   optional: [ILauncher],
   provides: IZethusTracker,
   autoStart: true
@@ -78,28 +65,44 @@ const plugin: JupyterFrontEndPlugin<IZethusTracker> = {
 
 export default plugin;
 
-function activate(app: JupyterLab,
+// function activate(
+//   app: JupyterFrontEnd,
+//   browserFactory: IFileBrowserFactory,
+//   restorer: ILayoutRestorer,
+//   menu: IMainMenu,
+//   palette: ICommandPalette,
+//   launcher: ILauncher | null
+// ): IDrawioTracker {
+
+function activate(
+  app: JupyterFrontEnd,
   browserFactory: IFileBrowserFactory,
   restorer: ILayoutRestorer,
-  menu: IMainMenu,
-  palette: ICommandPalette,
   settingRegistry: ISettingRegistry,
   launcher: ILauncher | null
 ): IZethusTracker {
-
   const namespace = 'zethus';
   const { commands } = app;
   const tracker = new WidgetTracker<ZethusWidget>({ namespace });
 
-  let defaultROSEndpoint = "";
-  let factory = new ZethusFactory({ name: FACTORY, fileTypes: ['zethus'], defaultFor: ['zethus'] }, defaultROSEndpoint);
+  let defaultROSEndpoint = '';
+  let factory = new ZethusFactory(
+    { name: FACTORY, fileTypes: ['zethus'], defaultFor: ['zethus'] },
+    defaultROSEndpoint
+  );
 
   const updateSettings = (settings: ISettingRegistry.ISettings): void => {
-    defaultROSEndpoint = settings.get("defaultROSEndpoint").composite as string;
-    factory = new ZethusFactory({ name: FACTORY, fileTypes: ['zethus'], defaultFor: ['zethus'] }, defaultROSEndpoint);
+    defaultROSEndpoint = settings.get('defaultROSEndpoint').composite as string;
+    factory = new ZethusFactory(
+      { name: FACTORY, fileTypes: ['zethus'], defaultFor: ['zethus'] },
+      defaultROSEndpoint
+    );
   };
 
-  Promise.all([settingRegistry.load('@jupyterlab/zethus:settings'), app.restored])
+  Promise.all([
+    settingRegistry.load('@jupyterlab/zethus:settings'),
+    app.restored
+  ])
     .then(([settings]) => {
       updateSettings(settings);
       settings.changed.connect(updateSettings);
@@ -108,19 +111,20 @@ function activate(app: JupyterLab,
       console.error(reason.message);
     });
 
-
   /**
    * Whether there is an active Zethus viewer.
    */
   function isEnabled(): boolean {
-    return tracker.currentWidget !== null &&
-      tracker.currentWidget === app.shell.currentWidget;
+    return (
+      tracker.currentWidget !== null &&
+      tracker.currentWidget === app.shell.currentWidget
+    );
   }
 
-  const zethusCSSSelector = '.jp-DirListing-item[title$=".zethus"]'
+  const zethusCSSSelector = '.jp-DirListing-item[title$=".zethus"]';
 
   app.contextMenu.addItem({
-    command: "zethus:launch-simulation",
+    command: 'zethus:launch-simulation',
     selector: zethusCSSSelector,
     rank: 1
   });
@@ -136,7 +140,9 @@ function activate(app: JupyterLab,
     widget.title.icon = 'jp-MaterialIcon ZethusIcon'; // TODO change
 
     // Notify the instance tracker if restore data needs to update.
-    widget.context.pathChanged.connect(() => { tracker.save(widget); });
+    widget.context.pathChanged.connect(() => {
+      tracker.save(widget);
+    });
     tracker.add(widget);
   });
   app.docRegistry.addWidgetFactory(factory);
@@ -144,13 +150,18 @@ function activate(app: JupyterLab,
   // Function to create a new untitled diagram file, given
   // the current working directory.
   const createNewZethus = (cwd: string) => {
-    return commands.execute('docmanager:new-untitled', {
-      path: cwd, type: 'file', ext: '.zethus'
-    }).then(model => {
-      return commands.execute('docmanager:open', {
-        path: model.path, factory: FACTORY
+    return commands
+      .execute('docmanager:new-untitled', {
+        path: cwd,
+        type: 'file',
+        ext: '.zethus'
+      })
+      .then(model => {
+        return commands.execute('docmanager:open', {
+          path: model.path,
+          factory: FACTORY
+        });
       });
-    });
   };
 
   app.docRegistry.addFileType({
@@ -158,7 +169,7 @@ function activate(app: JupyterLab,
     displayName: 'Zethus File',
     mimeTypes: ['application/json'],
     extensions: ['.zethus'],
-    iconClass: 'jp-MaterialIcon ZethusIcon',
+    icon: zethusIcon,
     fileFormat: 'text'
   });
 
@@ -167,17 +178,16 @@ function activate(app: JupyterLab,
     displayName: 'ROS Launch File',
     mimeTypes: ['application/xml'],
     extensions: ['.launch'],
-    iconClass: 'jp-MaterialIcon ROSLaunchIcon',
+    icon: zethusIcon,
     fileFormat: 'text'
   });
 
   commands.addCommand('zethus:launch', {
-    label: 'ZETHUS',
-    iconClass: 'jp-MaterialIcon ZethusIcon',
+    label: 'Zethus',
+    icon: zethusIcon,
     caption: 'Launch the Zethus viewer',
     execute: () => {
-      // console.log("Launching.");
-      let cwd = browserFactory.defaultBrowser.model.path;
+      const cwd = browserFactory.defaultBrowser.model.path;
       return createNewZethus(cwd);
     },
     isEnabled
@@ -193,12 +203,18 @@ function activate(app: JupyterLab,
   }
 
   Mode.getModeInfo().push({
-    name: "ROS Launch", mime: "application/xml", mode: "xml", ext: ["launch"]
+    name: 'ROS Launch',
+    mime: 'application/xml',
+    mode: 'xml',
+    ext: ['launch']
   });
 
   Mode.getModeInfo().push({
-    name: "Zethus", mime: "application/json", mode: "json", ext: ["zethus"]
-  })
+    name: 'Zethus',
+    mime: 'application/json',
+    mode: 'json',
+    ext: ['zethus']
+  });
 
   return tracker;
 }

@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="120mm"
+   height="120mm"
+   viewBox="0 0 120 120"
+   version="1.1"
+   id="svg3827"
+   inkscape:export-filename="/home/wolfv/zethus_logo.png"
+   inkscape:export-xdpi="211.67"
+   inkscape:export-ydpi="211.67"
+   inkscape:version="0.92.3 (2405546, 2018-03-11)"
+   sodipodi:docname="log.svg">
+  <defs
+     id="defs3821" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="1.4"
+     inkscape:cx="148.75288"
+     inkscape:cy="265.41759"
+     inkscape:document-units="mm"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="2493"
+     inkscape:window-height="1385"
+     inkscape:window-x="67"
+     inkscape:window-y="27"
+     inkscape:window-maximized="1" />
+  <metadata
+     id="metadata3824">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(0,-177)">
+    <g
+       id="g3845"
+       transform="matrix(0.75791659,0,0,0.75791659,-15.056298,153.99009)">
+      <polygon
+         id="polygon3782"
+         points="159.8,241.17 231.44,365.27 303.09,241.17 "
+         transform="matrix(0.26458333,0,0,0.26458333,14.363094,53.453311)" />
+      <polygon
+         id="polygon3784"
+         points="364.28,135.18 320,58.49 54.32,58.49 98.6,135.18 "
+         transform="matrix(0.26458333,0,0,0.26458333,14.363094,53.453311)" />
+      <polygon
+         id="polygon3786"
+         points="480.2,182.67 408.56,58.58 336.91,182.67 "
+         transform="matrix(0.26458333,0,0,0.26458333,14.363094,53.453311)" />
+      <polygon
+         id="polygon3788"
+         points="275.72,288.66 320,365.35 585.68,365.35 541.4,288.66 "
+         transform="matrix(0.26458333,0,0,0.26458333,14.363094,53.453311)" />
+    </g>
+  </g>
+</svg>
