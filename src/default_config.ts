@@ -14,7 +14,7 @@ export const default_config = (defaultROSEndpoint: string) => {
           }
         },
         "ros": {
-          "endpoint": "ws://localhost:8889/jupyterlab-ros/bridge"
+          "endpoint": "${defaultROSEndpoint}"
         },
         "infoTabs": [],
         "visualizations": [],
