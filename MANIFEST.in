@@ -14,10 +14,10 @@ graft jupyterlab_zethus/labextension
 graft src
 graft style
 graft schema
+graft zethus
 prune **/node_modules
 prune lib
 prune binder
-prune zethus
 
 # Patterns to exclude from any directory
 global-exclude *~
