@@ -53,9 +53,7 @@
     "@jupyterlab/mainmenu": "^3.0.9",
     "@jupyterlab/services": "^6.0.0",
     "@jupyterlab/settingregistry": "^3.0.0",
-    "@types/codemirror": "^5.60.0",
-    "@types/react-dom": "^17.0.7",
-    "react-dom": "^17.0.2"
+    "@types/codemirror": "^5.60.0"
   },
   "devDependencies": {
     "@jupyterlab/builder": "^3.0.0",
