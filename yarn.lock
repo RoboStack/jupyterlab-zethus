@@ -645,9 +645,6 @@
     mkdirp "^1.0.4"
     rimraf "^3.0.2"
 
-"@robostack/zethus@file:../zethus/build-lib":
-  version "0.0.0"
-
 "@sindresorhus/is@^0.14.0":
   version "0.14.0"
   resolved "https://registry.yarnpkg.com/@sindresorhus/is/-/is-0.14.0.tgz#9fb3a3cf3132328151f353de4632e01e52102bea"

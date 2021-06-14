@@ -17,6 +17,7 @@ graft schema
 prune **/node_modules
 prune lib
 prune binder
+prune zethus
 
 # Patterns to exclude from any directory
 global-exclude *~
