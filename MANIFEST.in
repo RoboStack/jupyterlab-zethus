@@ -9,12 +9,12 @@ include ts*.json
 include yarn.lock
 
 graft jupyterlab_zethus/labextension
+graft jupyterlab_zethus/zethus
 
 # Javascript files
 graft src
 graft style
 graft schema
-graft zethus
 prune **/node_modules
 prune lib
 prune binder
