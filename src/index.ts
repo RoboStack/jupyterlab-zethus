@@ -93,10 +93,8 @@ function activate(
 
   const updateSettings = (settings: ISettingRegistry.ISettings): void => {
     defaultROSEndpoint = settings.get('defaultROSEndpoint').composite as string;
-    factory = new ZethusFactory(
-      { name: FACTORY, fileTypes: ['zethus'], defaultFor: ['zethus'] },
-      defaultROSEndpoint
-    );
+    console.log(`Updating ROS Endpoint to --> ${defaultROSEndpoint}`);
+    factory.defaultROSEndpoint = defaultROSEndpoint;
   };
 
   Promise.all([
