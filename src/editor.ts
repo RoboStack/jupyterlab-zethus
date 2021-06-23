@@ -35,7 +35,8 @@ let zethusEditorId = 0;
 export class ZethusWidget extends DocumentWidget<Widget> {
   constructor(
     options: DocumentWidget.IOptions<Widget>,
-    defaultROSEndpoint: string
+    defaultROSEndpoint: string,
+    defaultROSPKGSEndpoint: string
   ) {
     super({ ...options });
     zethusEditorId += 1;
@@ -46,7 +47,8 @@ export class ZethusWidget extends DocumentWidget<Widget> {
     this.context.ready.then(() => {
       this._onContextReady();
     });
-    this.defaultROSEndpoint = defaultROSEndpoint;
+    this._defaultROSEndpoint = defaultROSEndpoint;
+    this._defaultROSPKGSEndpoint = defaultROSPKGSEndpoint;
     // this.context.ready.then(() => { this._handleDirtyStateNew(); });
   }
 
@@ -58,13 +60,12 @@ export class ZethusWidget extends DocumentWidget<Widget> {
     const baseUrl = PageConfig.getBaseUrl();
     if (!this.iframe) {
       this.iframe = document.createElement('iframe');
-      this.iframe.style.width = '100%';
-      this.iframe.style.height = '100%';
+      this.iframe.className = 'jp-iframe-zethus';
 
       const q = encodeURIComponent(JSON.stringify(state));
 
       this.iframe.src =
-        baseUrl + `zethus/app/index.html?config=${q}&zethusId=${this.zethusId}`;
+        baseUrl + `zethus/app/index.html?config=${q}&zethusId=${this.zethusId}&bridge=${this._defaultROSEndpoint}&pkgs=${this._defaultROSPKGSEndpoint}`;
 
       this.content.node.appendChild(this.iframe);
 
@@ -91,7 +92,7 @@ export class ZethusWidget extends DocumentWidget<Widget> {
   private _onContextReady(): void {
     const contextModel = this.context.model;
     if (this.context.model.toString() === '') {
-      this.context.model.fromString(default_config(this.defaultROSEndpoint));
+      this.context.model.fromString(default_config(this._defaultROSEndpoint, this._defaultROSPKGSEndpoint));
     }
     // Set the editor model value.
     this._onContentChanged();
@@ -159,7 +160,8 @@ export class ZethusWidget extends DocumentWidget<Widget> {
   readonly context: DocumentRegistry.Context;
   // private _editor : any;
   private _ready = new PromiseDelegate<void>();
-  private defaultROSEndpoint: string;
+  private _defaultROSEndpoint: string;
+  private _defaultROSPKGSEndpoint: string;
 }
 
 /**
@@ -174,18 +176,22 @@ export class ZethusFactory extends ABCWidgetFactory<
    */
   constructor(
     options: DocumentRegistry.IWidgetFactoryOptions,
-    defaultROSEndpoint: string
+    defaultROSEndpoint: string,
+    defaultROSPKGSEndpoint: string
   ) {
     super(options);
     this.defaultROSEndpoint = defaultROSEndpoint;
+    this.defaultROSPKGSEndpoint = defaultROSPKGSEndpoint;
   }
 
   protected createNewWidget(context: DocumentRegistry.Context): ZethusWidget {
     return new ZethusWidget(
       { context, content: new Widget() },
-      this.defaultROSEndpoint
+      this.defaultROSEndpoint,
+      this.defaultROSPKGSEndpoint
     );
   }
 
   defaultROSEndpoint: string;
+  defaultROSPKGSEndpoint: string;
 }
