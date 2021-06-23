@@ -1,4 +1,7 @@
-export const default_config = (defaultROSEndpoint: string, defaultROSPKGSEndpoint: string) => {
+export const default_config = (
+  defaultROSEndpoint: string,
+  defaultROSPKGSEndpoint: string
+) => {
   return `{
         "panels": {
           "sidebar": {

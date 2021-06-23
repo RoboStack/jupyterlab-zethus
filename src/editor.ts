@@ -65,7 +65,8 @@ export class ZethusWidget extends DocumentWidget<Widget> {
       const q = encodeURIComponent(JSON.stringify(state));
 
       this.iframe.src =
-        baseUrl + `zethus/app/index.html?config=${q}&zethusId=${this.zethusId}&bridge=${this._defaultROSEndpoint}&pkgs=${this._defaultROSPKGSEndpoint}`;
+        baseUrl +
+        `zethus/app/index.html?config=${q}&zethusId=${this.zethusId}&bridge=${this._defaultROSEndpoint}&pkgs=${this._defaultROSPKGSEndpoint}`;
 
       this.content.node.appendChild(this.iframe);
 
@@ -92,7 +93,9 @@ export class ZethusWidget extends DocumentWidget<Widget> {
   private _onContextReady(): void {
     const contextModel = this.context.model;
     if (this.context.model.toString() === '') {
-      this.context.model.fromString(default_config(this._defaultROSEndpoint, this._defaultROSPKGSEndpoint));
+      this.context.model.fromString(
+        default_config(this._defaultROSEndpoint, this._defaultROSPKGSEndpoint)
+      );
     }
     // Set the editor model value.
     this._onContentChanged();

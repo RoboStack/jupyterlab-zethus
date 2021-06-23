@@ -87,7 +87,7 @@ function activate(
 
   let defaultROSEndpoint = '';
   let defaultROSPKGSEndpoint = '';
-  let factory = new ZethusFactory(
+  const factory = new ZethusFactory(
     {
       name: FACTORY,
       fileTypes: ['zethus'],
@@ -99,8 +99,11 @@ function activate(
 
   const updateSettings = (settings: ISettingRegistry.ISettings): void => {
     defaultROSEndpoint = settings.get('defaultROSEndpoint').composite as string;
-    defaultROSPKGSEndpoint = settings.get('defaultROSPKGSEndpoint').composite as string;
-    console.log(`Updating ROS Endpoint to --> ${defaultROSEndpoint}, ${defaultROSPKGSEndpoint}`);
+    defaultROSPKGSEndpoint = settings.get('defaultROSPKGSEndpoint')
+      .composite as string;
+    console.log(
+      `Updating ROS Endpoint to --> ${defaultROSEndpoint}, ${defaultROSPKGSEndpoint}`
+    );
     factory.defaultROSEndpoint = defaultROSEndpoint;
     factory.defaultROSPKGSEndpoint = defaultROSPKGSEndpoint;
   };
