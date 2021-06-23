@@ -7,7 +7,13 @@
     "defaultROSEndpoint": {
       "title": "Default ROS Endpoint",
       "description": "Websocket URL to the default ROS endpoint",
-      "default": "ws://localhost:9090",
+      "default": "ws://localhost:9090/ros/bridge",
+      "type": "string"
+    },
+    "defaultROSPKGSEndpoint": {
+      "title": "Default ROSPKGS Endpoint",
+      "description": "Websocket URL to the default ROSPKGS endpoint to request ",
+      "default": "ws://localhost:9090/ros/pkgs",
       "type": "string"
     }
   },

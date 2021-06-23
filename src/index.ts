@@ -86,15 +86,26 @@ function activate(
   const tracker = new WidgetTracker<ZethusWidget>({ namespace });
 
   let defaultROSEndpoint = '';
-  let factory = new ZethusFactory(
-    { name: FACTORY, fileTypes: ['zethus'], defaultFor: ['zethus'] },
-    defaultROSEndpoint
+  let defaultROSPKGSEndpoint = '';
+  const factory = new ZethusFactory(
+    {
+      name: FACTORY,
+      fileTypes: ['zethus'],
+      defaultFor: ['zethus']
+    },
+    defaultROSEndpoint,
+    defaultROSPKGSEndpoint
   );
 
   const updateSettings = (settings: ISettingRegistry.ISettings): void => {
     defaultROSEndpoint = settings.get('defaultROSEndpoint').composite as string;
-    console.log(`Updating ROS Endpoint to --> ${defaultROSEndpoint}`);
+    defaultROSPKGSEndpoint = settings.get('defaultROSPKGSEndpoint')
+      .composite as string;
+    console.log(
+      `Updating ROS Endpoint to --> ${defaultROSEndpoint}, ${defaultROSPKGSEndpoint}`
+    );
     factory.defaultROSEndpoint = defaultROSEndpoint;
+    factory.defaultROSPKGSEndpoint = defaultROSPKGSEndpoint;
   };
 
   Promise.all([
