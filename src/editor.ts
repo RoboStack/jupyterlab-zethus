@@ -43,7 +43,7 @@ export class ZethusWidget extends DocumentWidget<Widget> {
     super({ ...options });
 
     this.title.icon = zethusIcon;
-    
+
     zethusEditorId += 1;
     this.zethusId = zethusEditorId;
     this.context = options['context'];
@@ -55,10 +55,6 @@ export class ZethusWidget extends DocumentWidget<Widget> {
     this._defaultROSEndpoint = defaultROSEndpoint;
     this._defaultROSPKGSEndpoint = defaultROSPKGSEndpoint;
     // this.context.ready.then(() => { this._handleDirtyStateNew(); });
-
-    const baseUrl = PageConfig.getBaseUrl();
-    console.debug(`URL: ${window.location.protocol}//${window.location.host}/zethus/app/image/viz/viz-point.png`);
-    console.debug(`URL: ${baseUrl}zethus/app/index.html`);
   }
 
   zethusId: number;
