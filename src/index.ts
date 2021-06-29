@@ -28,24 +28,18 @@ import { ISettingRegistry } from '@jupyterlab/settingregistry';
 
 import { Token } from '@lumino/coreutils';
 
-import { ZethusWidget, ZethusFactory } from './editor';
-
 import { Mode } from '@jupyterlab/codemirror';
 
-import { LabIcon } from '@jupyterlab/ui-components';
+import { ZethusWidget, ZethusFactory } from './editor';
+
+import { zethusIcon } from './icons';
 
 import '../style/index.css';
-import zethusIconSvg from '../style/icon.svg';
 
 /**
  * The name of the factory that creates editor widgets.
  */
 const FACTORY = 'Zethus';
-
-export const zethusIcon = new LabIcon({
-  name: 'jupyterlab-zethus:icon',
-  svgstr: zethusIconSvg
-});
 
 type IZethusTracker = IWidgetTracker<ZethusWidget>;
 
@@ -146,8 +140,6 @@ function activate(
   });
 
   factory.widgetCreated.connect((sender, widget) => {
-    widget.title.icon = 'jp-MaterialIcon ZethusIcon'; // TODO change
-
     // Notify the instance tracker if restore data needs to update.
     widget.context.pathChanged.connect(() => {
       tracker.save(widget);
