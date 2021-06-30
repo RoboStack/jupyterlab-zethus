@@ -30,8 +30,6 @@ import { zethusIcon } from './icons';
 
 import { default_config } from './default_config';
 
-// const DIRTY_CLASS = 'jp-mod-dirty';
-
 let zethusEditorId = 0;
 
 export class ZethusWidget extends DocumentWidget<Widget> {
@@ -55,6 +53,13 @@ export class ZethusWidget extends DocumentWidget<Widget> {
     this._defaultROSEndpoint = defaultROSEndpoint;
     this._defaultROSPKGSEndpoint = defaultROSPKGSEndpoint;
     // this.context.ready.then(() => { this._handleDirtyStateNew(); });
+
+    window.onmessage = (event: any) => {
+      if (event.data && event.data === 'save') {
+        event.preventDefault();
+        this.context.save();
+      }
+    };
   }
 
   zethusId: number;
