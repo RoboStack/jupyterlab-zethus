@@ -26,9 +26,9 @@ import { Message } from '@lumino/messaging';
 
 import { PromiseDelegate } from '@lumino/coreutils';
 
-import { default_config } from './default_config';
+import { zethusIcon } from './icons';
 
-// const DIRTY_CLASS = 'jp-mod-dirty';
+import { default_config } from './default_config';
 
 let zethusEditorId = 0;
 
@@ -39,6 +39,9 @@ export class ZethusWidget extends DocumentWidget<Widget> {
     defaultROSPKGSEndpoint: string
   ) {
     super({ ...options });
+
+    this.title.icon = zethusIcon;
+
     zethusEditorId += 1;
     this.zethusId = zethusEditorId;
     this.context = options['context'];
@@ -50,6 +53,13 @@ export class ZethusWidget extends DocumentWidget<Widget> {
     this._defaultROSEndpoint = defaultROSEndpoint;
     this._defaultROSPKGSEndpoint = defaultROSPKGSEndpoint;
     // this.context.ready.then(() => { this._handleDirtyStateNew(); });
+
+    window.onmessage = (event: any) => {
+      if (event.data && event.data === 'save') {
+        event.preventDefault();
+        this.context.save();
+      }
+    };
   }
 
   zethusId: number;
