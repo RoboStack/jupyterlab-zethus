@@ -103,7 +103,7 @@ function activate(
   };
 
   Promise.all([
-    settingRegistry.load('jupyterlab-zethus:settings'),
+    settingRegistry.load('jupyterlab-zethus:plugin'),
     app.restored
   ])
     .then(([settings]) => {
