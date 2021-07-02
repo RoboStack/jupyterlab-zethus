@@ -1,5 +1,5 @@
 {
-  "jupyter.lab.setting-icon-class": "ZethusIcon",
+  "jupyter.lab.setting-icon": "jupyterlab-zethus:icon",
   "jupyter.lab.setting-icon-label": "Zethus Settings",
   "title": "Zethus Settings",
   "description": "Zethus Extension Settings",

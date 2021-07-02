@@ -6,4 +6,6 @@
     width: 100%;
     height: 100%;
     border: none;
+    /* zethus only works well with a white background right now */
+    background: #FFF;
 }
